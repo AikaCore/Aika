@@ -1,9 +1,33 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36127.28 d17.14
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11222.15 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aika.Host", "Aika.Host\Aika.Host.csproj", "{23C0EC4E-8A7C-4EE9-B638-51F753210822}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aika", "Aika\Aika.csproj", "{729D6B51-43E5-485A-82B8-8B8A68567F7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aika.Tests", "Aika.Tests\Aika.Tests.csproj", "{5FB28E83-63B9-496E-9645-7ED80DB24ECC}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{23C0EC4E-8A7C-4EE9-B638-51F753210822}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23C0EC4E-8A7C-4EE9-B638-51F753210822}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23C0EC4E-8A7C-4EE9-B638-51F753210822}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23C0EC4E-8A7C-4EE9-B638-51F753210822}.Release|Any CPU.Build.0 = Release|Any CPU
+		{729D6B51-43E5-485A-82B8-8B8A68567F7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{729D6B51-43E5-485A-82B8-8B8A68567F7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{729D6B51-43E5-485A-82B8-8B8A68567F7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{729D6B51-43E5-485A-82B8-8B8A68567F7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FB28E83-63B9-496E-9645-7ED80DB24ECC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FB28E83-63B9-496E-9645-7ED80DB24ECC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FB28E83-63B9-496E-9645-7ED80DB24ECC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FB28E83-63B9-496E-9645-7ED80DB24ECC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
