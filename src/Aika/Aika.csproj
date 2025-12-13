@@ -8,6 +8,19 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
   </ItemGroup>
+
+  <PropertyGroup>
+	<PackageId>Aika</PackageId>
+	<Authors>LightChimera</Authors>
+	<Company>Aika</Company>
+	<Description>Aika SDK for building extensible plugins that integrate custom logic into the Aika assistant platform.</Description>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+	<RepositoryUrl>https://github.com/AikaCore/Aika</RepositoryUrl>
+	<RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
 
 </Project>

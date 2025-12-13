@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace Aika.Tests.Aika;
 
