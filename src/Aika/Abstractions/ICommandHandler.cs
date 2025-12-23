@@ -19,6 +19,6 @@ public interface ICommandHandler<TCommand, TResponse>
     /// <param name="command">The command instance to handle.</param>
     /// <param name="cancellationToken">Token to cancel the operation.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task HandleAsync(TCommand command, CancellationToken cancellationToken);
+    Task<TResponse> HandleAsync(TCommand command, CancellationToken cancellationToken);
 }
 

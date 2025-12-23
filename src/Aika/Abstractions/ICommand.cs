@@ -13,5 +13,10 @@ public interface ICommand<TResponse>
     /// String identifier of the command type used for routing.
     /// </summary>
     string CommandType { get; }
-}
 
+    /// <summary>
+    /// Identifier of the sender that initiated this command.
+    /// Can be used for auditing, correlation, and reply routing.
+    /// </summary>
+    string SenderId { get; }
+}

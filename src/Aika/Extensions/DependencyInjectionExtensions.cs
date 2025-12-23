@@ -5,20 +5,33 @@ namespace Aika;
 
 public static class DependencyInjectionExtensions
 {
-    public static IServiceCollection AddAikaHandlersFromAssemblyContains<TMarker>(this IServiceCollection services)
-        => services.AddAikaHandlersFromAssembly(typeof(TMarker).Assembly);
+    public static IServiceCollection AddAikaHandlersFromAssemblyContains<TMarker>(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Transient)
+        => services.AddAikaHandlersFromAssembly(typeof(TMarker).Assembly, lifetime);
 
-    public static IServiceCollection AddAikaHandlersFromAssembly(this IServiceCollection services, Assembly assembly)
+    public static IServiceCollection AddAikaHandlersFromAssembly(this IServiceCollection services, Assembly assembly, ServiceLifetime lifetime = ServiceLifetime.Transient)
     {
-        services.AddHandlers(assembly, typeof(IEventHandler<>));
-        services.AddHandlers(assembly, typeof(ICommandHandler<,>));
+        services.AddHandlers(
+            assembly,
+            typeof(IEventHandler<>),
+            (_, implementatoinType) => new ServiceDescriptor(implementatoinType, implementatoinType, lifetime)
+        );
+
+        services.AddHandlers(
+            assembly,
+            typeof(ICommandHandler<,>),
+            (interfaceType, implementatoinType) => new ServiceDescriptor(interfaceType, implementatoinType, lifetime)
+        );
 
         return services;
     }
 
-    private static IServiceCollection AddHandlers(this  IServiceCollection services, Assembly assembly, Type handlerInterfaceType)
+    private static IServiceCollection AddHandlers(
+        this IServiceCollection services, 
+        Assembly assembly, 
+        Type handlerInterfaceType,
+        Func<Type, Type, ServiceDescriptor> descriptorFactory)
     {
-        var eventHandlerTypes = assembly.GetTypes()
+        var handlerTypes = assembly.GetTypes()
             .Where(t => t.IsAbstract is false 
                 && t.IsInterface is false 
                 && t.IsGenericTypeDefinition is false
@@ -30,7 +43,7 @@ public static class DependencyInjectionExtensions
                 )
             );
 
-        foreach (var handlerType in eventHandlerTypes)
+        foreach (var handlerType in handlerTypes)
         {
             var interfaces = handlerType.GetInterfaces()
                 .Where(i => i.IsGenericType 
@@ -47,7 +60,8 @@ public static class DependencyInjectionExtensions
                     .MakeGenericType(genericTypes)
                     ?? throw new InvalidOperationException($"Failed to register handlers for assembly {assembly.GetName()}");
 
-                services.AddTransient(genericInterface, handlerType);
+                var descriptor = descriptorFactory(genericInterface, handlerType);
+                services.Add(descriptor);
             }
         }
 

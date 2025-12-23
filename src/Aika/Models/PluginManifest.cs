@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using Aika.Helpers;
+using NuGet.Versioning;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Aika;
@@ -7,7 +9,7 @@ namespace Aika;
 /// Contains metadata and configuration information for an Aika plugin.
 /// Describes plugin identity, versioning, runtime requirements, capabilities, and dependencies.
 /// </summary>
-public sealed class PluginManifest
+public class PluginManifest
 {
     /// <summary>
     /// Unique identifier for the plugin.
@@ -17,12 +19,13 @@ public sealed class PluginManifest
     /// <summary>
     /// Semantic version of the plugin.
     /// </summary>
-    public required Version Version { get; init; }
+    [JsonConverter(typeof(NuGetVersionJsonConverter))]
+    public required NuGetVersion Version { get; init; }
 
     /// <summary>
     /// Composite identifier combining plugin ID and version in the format "Id@Major.Minor.Build".
     /// </summary>
-    public string FullId => $"{Id}@{Version.ToString(3)}";
+    public string FullId => $"{Id}@{Version}";
 
     /// <summary>
     /// Human-readable display name of the plugin.
@@ -45,9 +48,10 @@ public sealed class PluginManifest
     public string? License { get; init; }
 
     /// <summary>
-    /// Minimum version of the Aika host application required to run this plugin.
+    /// Version of the Aika host application required to run this plugin.
     /// </summary>
-    public Version? MinimumHostVersion { get; init; }
+    [JsonConverter(typeof(VersionRangeJsonConverter))]
+    public VersionRange? RequiredHostVersion { get; init; }
 
 
     /// <summary>
@@ -60,7 +64,7 @@ public sealed class PluginManifest
     /// Optional array of other plugins that this plugin depends on.
     /// Dependencies must be loaded before this plugin can initialize.
     /// </summary>
-    public PluginDependence[]? Dependences { get; init; }
+    public PluginDependence[]? Dependencies { get; init; }
 
     [JsonInclude]
     [JsonPropertyName("PluginConfiguration")]
@@ -79,8 +83,8 @@ public sealed class PluginManifest
     public TConfiguration GetConfiguration<TConfiguration>()
         where TConfiguration : class
     {
-        if (_cachedConfiguration is not null)
-            return (TConfiguration)_cachedConfiguration;
+        if (_cachedConfiguration is TConfiguration cached)
+            return cached;
 
         if (_pluginConfiguration.HasValue is false)
             throw new InvalidOperationException("Failed to retrieve configuration: 'PluginConfiguration' is null. Ensure that the configuration object is defined in the manifest file");

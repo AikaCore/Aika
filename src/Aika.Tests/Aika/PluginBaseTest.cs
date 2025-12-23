@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
+using NuGet.Versioning;
 using System.Reflection;
 using System.Text.Json;
 
@@ -43,7 +44,14 @@ public class PluginBaseTests
             {
                 MagicName = "lcma",
                 MagicNumber = 20
-            }
+            },
+            Dependences = [
+                new ()
+                {
+                    PluginId = "abc",
+                    Version = VersionRange.Parse("[1.0.0, 2.0.0]")
+                }
+            ]
         };
 
         var manifestPath = Path.Combine(_testPluginDirectory, TestManifestFileName);
@@ -63,7 +71,7 @@ public class PluginBaseTests
         {
             Assert.That(PluginBase.PluginManifest.FullId, Is.EqualTo("test.plugin@1.0.0"));
             Assert.That(PluginBase.PluginManifest.Name, Is.EqualTo("Test Plugin"));
-            Assert.That(PluginBase.PluginManifest.Version.ToString(3), Is.EqualTo("1.0.0"));
+            Assert.That(PluginBase.PluginManifest.Version.ToString(), Is.EqualTo("1.0.0"));
         });
 
         Assert.That(config, Is.Not.Null);
@@ -79,6 +87,8 @@ public class PluginBaseTests
         public required string Id { get; set; }
         public required string Name { get; set; }
         public required string Version { get; set; }
+
+        public required List<PluginDependence> Dependences { get; set; }
 
         public CustomPluginConfig? PluginConfiguration { get; set; }
     }

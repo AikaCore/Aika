@@ -29,4 +29,3 @@ public interface IMessageBus
     Task<TResponse> SendAsync<TCommand, TResponse>(TCommand command, CancellationToken cancellationToken)
         where TCommand : ICommand<TResponse>;
 }
-

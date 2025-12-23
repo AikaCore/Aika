@@ -1,4 +1,8 @@
-﻿namespace Aika;
+﻿using Aika.Helpers;
+using NuGet.Versioning;
+using System.Text.Json.Serialization;
+
+namespace Aika;
 
 /// <summary>
 /// Represents a plugin dependency requirement.
@@ -9,10 +13,11 @@ public sealed class PluginDependence
     /// <summary>
     /// Unique identifier of the required plugin.
     /// </summary>
-    public required string Id { get; set; }
+    public required string PluginId { get; set; }
 
     /// <summary>
     /// Minimum version of the required plugin that satisfies this dependency.
     /// </summary>
-    public required Version Version { get; set; }
+    [JsonConverter(typeof(VersionRangeJsonConverter))]
+    public required VersionRange Version { get; set; }
 }
