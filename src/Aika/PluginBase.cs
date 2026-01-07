@@ -36,6 +36,23 @@ public abstract class PluginBase(ILogger<PluginBase> logger) : IPlugin
         services.AddAikaHandlersFromAssembly(pluginAssembly);
     }
 
+    /// <summary>
+    /// Loads and deserializes the <c>plugin.json</c> manifest file located in the same directory
+    /// as the specified plugin assembly.
+    /// </summary>
+    /// <param name="assembly">
+    /// Plugin assembly used to resolve the directory containing the <c>plugin.json</c> file.
+    /// </param>
+    /// <param name="cancellationToken">
+    /// Token used to cancel the asynchronous file read operation.
+    /// </param>
+    /// <returns>
+    /// Deserialized <see cref="PluginManifest"/> instance.
+    /// </returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the plugin directory cannot be resolved, the manifest file is missing,
+    /// or the manifest content is invalid or cannot be deserialized.
+    /// </exception>
     protected async Task<PluginManifest> LoadManifestFromAssemblyAsync(Assembly assembly, CancellationToken cancellationToken)
     {
         var pluginDir = Path.GetDirectoryName(assembly.Location)

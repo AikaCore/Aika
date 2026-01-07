@@ -97,5 +97,4 @@ public class PluginManifest
         _pluginConfiguration = null;
         return configuration;
     }
-
 }

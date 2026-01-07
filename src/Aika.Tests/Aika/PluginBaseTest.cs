@@ -62,16 +62,16 @@ public class PluginBaseTests
         var services = new ServiceCollection();
 
         // Act
-        await plugin.InitAsync(services, CancellationToken.None);
-        var config = PluginBase.PluginManifest?.GetConfiguration<CustomPluginConfig>();
+        await plugin.InitAsync(services, null, null, CancellationToken.None);
+        var config = TestPlugin.PluginManifest?.GetConfiguration<CustomPluginConfig>();
 
         // Assert
-        Assert.That(PluginBase.PluginManifest, Is.Not.Null);
+        Assert.That(TestPlugin.PluginManifest, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(PluginBase.PluginManifest.FullId, Is.EqualTo("test.plugin@1.0.0"));
-            Assert.That(PluginBase.PluginManifest.Name, Is.EqualTo("Test Plugin"));
-            Assert.That(PluginBase.PluginManifest.Version.ToString(), Is.EqualTo("1.0.0"));
+            Assert.That(TestPlugin.PluginManifest.FullId, Is.EqualTo("test.plugin@1.0.0"));
+            Assert.That(TestPlugin.PluginManifest.Name, Is.EqualTo("Test Plugin"));
+            Assert.That(TestPlugin.PluginManifest.Version.ToString(), Is.EqualTo("1.0.0"));
         });
 
         Assert.That(config, Is.Not.Null);
@@ -102,6 +102,7 @@ public class PluginBaseTests
     public class TestPlugin : PluginBase
     {
         private readonly string _testDirectory;
+        public static PluginManifest? PluginManifest { get; set; }
 
         public TestPlugin(ILogger<TestPlugin> logger, string testDirectory)
             : base(logger)
@@ -109,7 +110,7 @@ public class PluginBaseTests
             _testDirectory = testDirectory;
         }
 
-        public override async Task InitAsync(IServiceCollection services, CancellationToken cancellationToken)
+        public override async Task InitAsync(IServiceCollection services, IHandlerRegistrator handlerRegistrator, Assembly pluginAssembly, CancellationToken cancellationToken)
         {
             PluginManifest = await LoadManifestFromTestDirectory(cancellationToken);
         }

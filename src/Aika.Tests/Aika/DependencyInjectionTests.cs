@@ -24,7 +24,7 @@ public class AddAikaHandlersFromAssemblyTests
         var provider = _services.BuildServiceProvider();
 
         // Assert
-        var handlers = provider.GetServices<IEventHandler<TestEvent>>();
+        var handlers = provider.GetServices<TestEventHandler>();
         Assert.That(handlers.Count(), Is.Not.Zero);
         Assert.That(handlers.Any(h => typeof(TestEventHandler) == h.GetType()));
     }
@@ -46,40 +46,23 @@ public class AddAikaHandlersFromAssemblyTests
     }
 
     [Test]
-    public void AddAikaHandlersFromAssembly_ShouldRegisterBothHandlerTypes()
+    public void AddAikaHandlersFromAssembly_ShouldRegisterAsSingleton()
     {
         // Arrange
         var assembly = typeof(TestEventHandler).Assembly;
 
         // Act
-        _services.AddAikaHandlersFromAssembly(assembly);
+        _services.AddAikaHandlersFromAssembly(assembly, ServiceLifetime.Singleton);
 
         // Assert
-        Assert.That(_services, Has.Some.Matches<ServiceDescriptor>(d =>
-            d.ServiceType == typeof(IEventHandler<TestEvent>) &&
-            d.ImplementationType == typeof(TestEventHandler)));
-
-        Assert.That(_services, Has.Some.Matches<ServiceDescriptor>(d =>
-            d.ServiceType == typeof(ICommandHandler<TestCommand, TestResult>) &&
-            d.ImplementationType == typeof(TestCommandHandler)));
-    }
-
-    [Test]
-    public void AddAikaHandlersFromAssembly_ShouldRegisterAsTransient()
-    {
-        // Arrange
-        var assembly = typeof(TestEventHandler).Assembly;
-
-        // Act
-        _services.AddAikaHandlersFromAssembly(assembly);
-
-        // Assert
-        var descriptors = _services.Where(d =>
-            d.ImplementationType == typeof(TestEventHandler) ||
-            d.ImplementationType == typeof(TestCommandHandler));
+        var descriptors = _services
+            .Where(d => d.ImplementationType == typeof(TestEventHandler) 
+                || d.ImplementationType == typeof(TestCommandHandler)
+            );
 
         Assert.That(descriptors, Is.All.Matches<ServiceDescriptor>(d =>
-            d.Lifetime == ServiceLifetime.Transient));
+            d.Lifetime == ServiceLifetime.Singleton)
+        );
     }
 
     [Test]
@@ -121,11 +104,14 @@ public class AddAikaHandlersFromAssemblyTests
         var provider = _services.BuildServiceProvider();
 
         // Assert
-        var eventHandler = provider.GetService<IEventHandler<MultiEvent>>();
+        var eventHandler = provider.GetService<MultiHandler>();
         var commandHandler = provider.GetService<ICommandHandler<MultiCommand, TestResult>>();
 
-        Assert.That(eventHandler, Is.InstanceOf<MultiHandler>());
-        Assert.That(commandHandler, Is.InstanceOf<MultiHandler>());
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(eventHandler, Is.InstanceOf<MultiHandler>());
+            Assert.That(commandHandler, Is.InstanceOf<MultiHandler>());
+        }
     }
 
     [Test]
@@ -139,22 +125,6 @@ public class AddAikaHandlersFromAssemblyTests
 
         // Assert
         Assert.That(result, Is.SameAs(_services));
-    }
-
-    [Test]
-    public void AddAikaHandlersFromAssembly_ShouldCreateNewInstancesForTransient()
-    {
-        // Arrange
-        var assembly = typeof(TestEventHandler).Assembly;
-        _services.AddAikaHandlersFromAssembly(assembly);
-        var provider = _services.BuildServiceProvider();
-
-        // Act
-        var handler1 = provider.GetService<IEventHandler<TestEvent>>();
-        var handler2 = provider.GetService<IEventHandler<TestEvent>>();
-
-        // Assert
-        Assert.That(handler1, Is.Not.SameAs(handler2));
     }
 
     [Test]
@@ -197,7 +167,7 @@ public class AddAikaHandlersFromAssemblyTests
         var provider = _services.BuildServiceProvider();
 
         // Assert
-        var handler = provider.GetService<IEventHandler<TestEvent>>();
+        var handler = provider.GetService<ConcreteGenericHandler>();
         Assert.That(handler, Is.InstanceOf<ConcreteGenericHandler>());
     }
 
@@ -214,6 +184,8 @@ public class AddAikaHandlersFromAssemblyTests
     private class TestCommand : ICommand<TestResult>
     {
         public string CommandType => throw new NotImplementedException();
+
+        public string SenderId => throw new NotImplementedException();
     }
     
     private class TestResult { }
@@ -240,6 +212,11 @@ public class AddAikaHandlersFromAssemblyTests
         {
             throw new NotImplementedException();
         }
+
+        Task<TestResult> ICommandHandler<TestCommand, TestResult>.HandleAsync(TestCommand command, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     private class MultiEvent : IEvent
@@ -250,6 +227,8 @@ public class AddAikaHandlersFromAssemblyTests
     private class MultiCommand : ICommand<TestResult>
     {
         public string CommandType => throw new NotImplementedException();
+
+        public string SenderId => throw new NotImplementedException();
     }
 
     private class MultiHandler : IEventHandler<MultiEvent>, ICommandHandler<MultiCommand, TestResult>
@@ -259,7 +238,7 @@ public class AddAikaHandlersFromAssemblyTests
             throw new NotImplementedException();
         }
 
-        public Task HandleAsync(MultiCommand command, CancellationToken cancellationToken)
+        public Task<TestResult> HandleAsync(MultiCommand command, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
