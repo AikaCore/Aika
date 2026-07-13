@@ -28,4 +28,19 @@ public interface IMessageBus
     /// <returns>A task representing the asynchronous operation, containing the handler's response.</returns>
     Task<TResponse> SendAsync<TCommand, TResponse>(TCommand command, CancellationToken cancellationToken)
         where TCommand : ICommand<TResponse>;
+
+    /// <summary>
+    /// Asynchronously sends a command when the response type is not known at compile time.
+    /// </summary>
+    /// <param name="command">
+    /// The command instance to send. Must implement <see cref="ICommand"/>.
+    /// </param>
+    /// <param name="cancellationToken">
+    /// A token used to cancel the operation.
+    /// </param>
+    /// <returns>
+    /// A task representing the asynchronous operation, containing the handler response
+    /// as an <see cref="object"/>, or <c>null</c> if the command does not produce a result.
+    /// </returns>
+    Task<object?> SendAsync(ICommand command, CancellationToken cancellationToken);
 }
